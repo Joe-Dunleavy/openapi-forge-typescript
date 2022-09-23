@@ -1,8 +1,6 @@
 import { binding, after, then, when, given } from "cucumber-tsflow";
 import { assert, expect } from "chai";
-
 import { RequestParameters } from "../../template/request";
-
 import { BaseModelStep } from "./base";
 
 const isJson = (str: string): boolean => {
