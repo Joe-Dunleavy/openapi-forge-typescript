@@ -1,5 +1,5 @@
 import { binding, after, then, when, given } from "cucumber-tsflow";
-import { assert } from "chai";
+import { assert, expect } from "chai";
 
 import { RequestParameters } from "../../template/request";
 
@@ -79,6 +79,11 @@ export class ModelSteps extends BaseModelStep {
   @then(/the request should have a body with value "(.*)"/)
   public checkRequestBody(body: string) {
     assert.equal(this.requestParams.body, body);
+  }
+
+  @then(/the request should have a header property with value (.*)/)
+  public checkRequestHeaders(headerParam: string) {
+    expect(this.requestParams.headers).to.have.property("test", headerParam)
   }
 
   @when(/calling the method ([a-zA-Z]*) and the server provides an empty response/)
