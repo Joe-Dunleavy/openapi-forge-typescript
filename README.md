@@ -25,15 +25,15 @@ $ openapi-forge forge
 
 Using the one command below you can automatically run the testing:
 ~~~
-npm test [{featurePath} [{generatorPath}] ]
+npm test [{featurePath} {generatorPath}]
 ~~~
 The two arguments are optional.
 
-You must give a featurePath if you want to give a generatorPath.
+You must give a featurePath and a generatorPath if you want custom paths.
 
 Default values:
 
-featurePath: ../openapi-forge/features/*.feature
+featurePath: node_modules/openapi-forge/features/*.feature
 
 generatorPath: openapi-forge/src/generate
 
