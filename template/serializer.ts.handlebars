@@ -45,6 +45,12 @@ export function deserialize(json: any, type: string): any {
 }
 
 export function serialize(item: any, type: string): string {
+  if (type.endsWith("[]")) {
+    const arrayType = type.substring(0, type.length - 2);
+    return item
+      .map((item: any) => serialize(item, arrayType))
+      .join(",");
+  }
   return typeof item === "object" ? JSON.stringify(item) : item.toString();
 }
 

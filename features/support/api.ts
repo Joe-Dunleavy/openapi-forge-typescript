@@ -46,6 +46,14 @@ export class ModelSteps extends BaseModelStep {
     this.api = this.createApi();
   }
 
+  @when(/calling the method ([a-zA-Z]*) with object (.*)/)
+  public async callMethodWithRequestBody(methodName: string, value: string) {
+    if (!this.api[methodName]) {
+      console.error(`Method ${methodName} not found`);
+    }
+    await this.api[methodName](JSON.parse(value));
+  }
+
   @when(/calling the method ([a-zA-Z]*) without params/)
   public async callMethod(methodName: string) {
     if (!this.api[methodName]) {
@@ -64,6 +72,14 @@ export class ModelSteps extends BaseModelStep {
     await this.api[methodName].apply(this.api, values);
   }
 
+  @when(/calling the method ([a-zA-Z]*) with array "(.*)"/)
+  public async callMethodWithArray(methodName: string, array: string) {
+    if (!this.api[methodName]) {
+      console.error(`Method ${methodName} not found`);
+    }
+    await this.api[methodName](array.split(","));
+  }
+
   @when("selecting the server at index {int}")
   public selectServerAtIndex(index: number) {
     this.api = this.createApi(index);
@@ -74,7 +90,7 @@ export class ModelSteps extends BaseModelStep {
     assert.equal(this.requestParams.url, url);
   }
 
-  @then(/the request should have a body with value "(.*)"/)
+  @then(/the request should have a body with value (.*)/)
   public checkRequestBody(body: string) {
     assert.equal(this.requestParams.body, body);
   }

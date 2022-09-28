@@ -1,10 +1,5 @@
 import Configuration from "./configuration";
-
-export interface Parameter {
-  name: string;
-  value: string;
-  type: string;
-}
+import { Parameter } from "./parameterBuilder";
 
 export interface Headers {
   [index: string]: string;
@@ -24,7 +19,7 @@ export async function request(
   params: Parameter[]
 ): Promise<any> {
   // replace path parameters with values
-  for (const pathParam of params.filter((p) => p.type === "path")) {
+  for (const pathParam of params.filter((p) => p.location === "path")) {
     path = path.replace(
       `{${pathParam.name}}`,
       encodeURIComponent(pathParam.value.toString())
@@ -35,7 +30,7 @@ export async function request(
     (config.basePath ?? "") + config.servers[config.selectedServerIndex] + path;
 
   // build the query string
-  const queryParams = params.filter((p) => p.type === "query");
+  const queryParams = params.filter((p) => p.location === "query");
   if (method === "get" && queryParams.length > 0) {
     url +=
       "?" +
@@ -46,7 +41,7 @@ export async function request(
 
   // add additional headers
   const additionalHeaders = params
-    .filter((p) => p.type === "header")
+    .filter((p) => p.location === "header")
     .reduce<Headers>((acc, param) => {
       acc[param.name] = param.value;
       return acc;
@@ -67,7 +62,7 @@ export async function request(
     },
   };
 
-  const bodyParam = params.find((p) => p.type === "body");
+  const bodyParam = params.find((p) => p.location === "body");
   if (bodyParam) {
     requestParams.body = bodyParam.value;
   }

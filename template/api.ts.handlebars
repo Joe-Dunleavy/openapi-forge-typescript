@@ -1,7 +1,8 @@
 import Configuration from "./configuration";
 {{>modelIncludes models=components.schemas options=_options}}
 {{>modelIncludes models=components.inlineObjects options=_options}}
-import { request, Parameter } from "./request";
+import { request } from "./request";
+import { Parameter, ParameterBuilder } from "./parameterBuilder";
 import { deserialize, serialize } from "./serializer";
 
 // {{info.title}}
@@ -29,26 +30,19 @@ export default class Api {
         {{#if schema.default}} = {{{quoteIfString schema.default}}}{{/if}},
       {{/each}}
     ): Promise<{{#if _response.schema}}{{typeConvert _response.schema ../../_options}}{{else}}null{{/if}}> {
-      const params: Parameter[] = [
-        {{#each _sortedParameters}}{{#unless _optional}}
-          {
-            name: "{{name}}",
-            value: serialize({{name}}, "{{typeConvert schema}}"),
-            type: "{{in}}"
-          },
-        {{/unless}}{{/each}}
-      ];
+
+      const builder = new ParameterBuilder();
+      {{#each _sortedParameters}}{{#unless _optional}}
+      builder.add("{{name}}", {{name}}, "{{typeConvert schema}}", "{{in}}");
+      {{/unless}}{{/each}}
+      
       {{#each _sortedParameters}}{{#if _optional}}
       if ({{name}}) {
-        params.push({
-          name: "{{name}}",
-          value: serialize({{name}}, "{{typeConvert schema}}"),
-          type: "{{in}}"
-        })
+        builder.add("{{name}}", {{name}}, "{{typeConvert schema}}", "{{in}}");
       }
       {{/if}}{{/each}}
 
-      const response = await request(this.config, "{{@root.path}}", "{{@key}}", params);
+      const response = await request(this.config, "{{@root.path}}", "{{@key}}", builder.parameters);
       {{#if _response.schema}}
       return deserialize(response, "{{typeConvert _response.schema}}");
       {{else}}
