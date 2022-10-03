@@ -5,10 +5,15 @@ export interface Headers {
   [index: string]: string;
 }
 
+export interface Cookies {
+  [index: string]: string;
+}
+
 export interface RequestParameters {
   url: string;
   method: string;
   body?: string;
+  cookies?: Cookies;
   headers: Headers;
 }
 
@@ -65,6 +70,17 @@ export async function request(
   const bodyParam = params.find((p) => p.location === "body");
   if (bodyParam) {
     requestParams.body = bodyParam.value;
+  }
+
+  //add cookie params if they exist
+  const cookieParam = params.find((p) => p.location === "cookie");
+  if (cookieParam) {
+    requestParams.cookies = params
+    .filter((p) => p.location === "cookie")
+    .reduce<Cookies>((acc, param) => {
+      acc[param.name] = param.value;
+      return acc;
+    }, {});
   }
 
   return await config.transport(requestParams);
