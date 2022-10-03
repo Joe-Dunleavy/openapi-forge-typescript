@@ -5,15 +5,10 @@ export interface Headers {
   [index: string]: string;
 }
 
-export interface Cookies {
-  [index: string]: string;
-}
-
 export interface RequestParameters {
   url: string;
   method: string;
   body?: string;
-  cookies?: Cookies;
   headers: Headers;
 }
 
@@ -52,6 +47,18 @@ export async function request(
       return acc;
     }, {});
 
+  // add cookies to headers
+  const cookies = params
+  .filter((p) => p.location === "cookie")
+  .reduce<Headers>((acc, param, index, array) => {
+    acc["cookie"] ??= "";
+    acc["cookie"] += `${param.name}=${param.value}`;
+    if(index !== array.length - 1){
+      acc["cookie"] += ";"
+    }
+    return acc;
+  }, {});
+
   // provide a bearer token if required
   if (config.bearerToken) {
     additionalHeaders["Authorization"] = `Bearer ${config.bearerToken}`;
@@ -64,6 +71,7 @@ export async function request(
       accept: "application/json",
       "Content-Type": "application/json",
       ...additionalHeaders,
+      ...cookies,
     },
   };
 
@@ -71,17 +79,6 @@ export async function request(
   if (bodyParam) {
     requestParams.body = bodyParam.value;
   }
-
-  //add cookie params if they exist
-  const cookieParam = params.find((p) => p.location === "cookie");
-  if (cookieParam) {
-    requestParams.cookies = params
-    .filter((p) => p.location === "cookie")
-    .reduce<Cookies>((acc, param) => {
-      acc[param.name] = param.value;
-      return acc;
-    }, {});
-  }
-
+  
   return await config.transport(requestParams);
 }

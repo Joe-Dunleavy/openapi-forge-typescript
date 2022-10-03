@@ -100,9 +100,9 @@ export class ModelSteps extends BaseModelStep {
     expect(this.requestParams.headers).to.have.property("test", headerParam)
   }
 
-  @then(/the request should have a cookie property with value (.*)/)
+  @then(/the request header should have a cookie property with value (.*)/)
   public checkRequestCookie(cookieParam: string) {
-    expect(this.requestParams.cookies).to.have.property("test", cookieParam)
+    expect(this.requestParams.headers).to.have.property("cookie", cookieParam)
   }
 
   @when(/calling the method ([a-zA-Z]*) and the server provides an empty response/)
